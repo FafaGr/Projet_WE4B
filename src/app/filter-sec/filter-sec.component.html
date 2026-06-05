@@ -1,0 +1,38 @@
+<section class="mb-5" id="filters">
+  <div class="row g-3">
+
+    <div class="col-md-6">
+      <div class="input-group">
+        <input
+          type="text"
+          class="form-control bg-secondary border-0 text-white"
+          placeholder="Rechercher un jeu..."
+          [(ngModel)]="searchTerm"
+        >
+        <button class="btn btn-danger" type="button" (click)="onSearch()">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <select class="form-select bg-secondary border-0 text-white" [(ngModel)]="selectedCategoryId" (change)="onSearch()">
+        <option [ngValue]="0">Toutes les catégories</option>
+
+        <option *ngFor="let cat of categories" [ngValue]="cat.id_cat">
+          {{ cat.libelle }}
+        </option>
+      </select>
+    </div>
+
+    <div class="col-md-3">
+      <select class="form-select bg-secondary border-0 text-white" [(ngModel)]="selectedSort" (change)="onSearch()">
+        <option value="news">Nouveautés</option>
+        <option value="price-asc">Prix : croissant</option>
+        <option value="price-desc">Prix : décroissant</option>
+        <option value="popular">Populaires</option>
+      </select>
+    </div>
+
+  </div>
+</section>

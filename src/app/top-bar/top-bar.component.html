@@ -1,0 +1,75 @@
+<!-- Navigation Header -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-darker sticky-top border-bottom border-secondary">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold" href="index.php">
+      <i class="fas fa-gamepad text-danger"></i> <span class="text-danger">Game</span>Store
+    </a>
+
+    <!-- Search Bar -->
+    <div class="search-box-wrapper ms-3 flex-grow-1 d-none d-md-block">
+      <div class="input-group input-group-sm">
+        <input
+          type="text"
+          class="form-control bg-secondary border-0 text-white"
+          id="search"
+          placeholder="Rechercher un jeu..."
+          aria-label="Rechercher"
+        >
+        <button class="btn btn-danger" type="button">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li>
+          <a href="admin_dashboard.php" class="bg-yellow-600/20 text-yellow-500 border border-yellow-500/50 px-3 py-1 rounded text-sm font-bold hover:bg-yellow-600 hover:text-white transition">
+            🛠 Admin Panel
+          </a>
+        </li>
+        <!--<?php endif; ?>-->
+        <li class="nav-item">
+          <a class="nav-link" href="index.php">
+            <i class="fas fa-home"></i> Accueil
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="jeux_pc.php">
+            <i class="fas fa-desktop"></i> PC
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="jeux_console.php">
+            <i class="fas fa-gamepad"></i> Console
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link position-relative" href="panier.php">
+            <i class="fas fa-shopping-cart"></i> Panier
+            <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">0</span>
+          </a>
+        </li>
+        <li class="nav-item dropdown ms-2">
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+            <i class="fas fa-user"></i>
+            Compte
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="userDropdown">
+            <li><span class="dropdown-item-text text-secondary small">Connecté en tant que<br><strong class="text-white"><?= htmlspecialchars($_SESSION['nom']); ?></strong></span></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="logout.php">Déconnexion</a></li>
+
+            <li><a class="dropdown-item" href="connexion.php">Connexion</a></li>
+            <li><a class="dropdown-item" href="inscription.php">Inscription</a></li>
+
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
