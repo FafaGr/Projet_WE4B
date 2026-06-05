@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'Projet_WE4B';
+  title = 'GameStore - Boutique de Jeux Vidéo';
 }
