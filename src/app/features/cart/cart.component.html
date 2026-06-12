@@ -1,0 +1,92 @@
+<main class="container-fluid px-4 py-5 text-white bg-dark">
+  <div class="border-bottom border-secondary pb-4 mb-4">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <h1 class="mb-0"><i class="fas fa-shopping-cart text-danger"></i> Votre Panier</h1>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <p class="text-secondary mb-0">{{ totalItems }} article{{ totalItems > 1 ? 's' : '' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="orderConfirmed" class="text-center py-5 bg-dark border border-success rounded">
+    <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+    <h3 class="text-success">Commande confirmée !</h3>
+    <p class="text-secondary mt-2">Merci pour votre achat. Vos clés d'activation vous seront envoyées par e-mail.</p>
+    <a routerLink="/games" class="btn btn-danger mt-3"><i class="fas fa-home"></i> Retour à la boutique</a>
+  </div>
+
+  <div class="row" *ngIf="!orderConfirmed">
+    <div class="col-lg-8">
+      
+      <div *ngIf="cartItems.length === 0" class="text-center py-5 bg-dark border border-secondary rounded">
+        <i class="fas fa-shopping-cart fa-3x text-secondary mb-3"></i>
+        <h3 class="text-secondary">Votre panier est vide</h3>
+        <a routerLink="/games" class="btn btn-danger mt-3"><i class="fas fa-arrow-right"></i> Retour à la boutique</a>
+      </div>
+
+      <div *ngIf="cartItems.length > 0">
+        <div class="cart-item" *ngFor="let item of cartItems">
+          <img [src]="item.image" [alt]="item.title">
+          <div class="flex-grow-1">
+            <div class="fw-bold fs-5">{{ item.title }}</div>
+            <p class="text-secondary small mb-1">Clé d'activation instantanée</p>
+            
+            <div class="quantity-control">
+              <button (click)="changeQuantity(item.id, item.quantity, -1)">−</button>
+              <span class="quantity-display">{{ item.quantity }}</span>
+              <button (click)="changeQuantity(item.id, item.quantity, 1)" 
+                      [disabled]="item.quantity >= item.stock"
+                      [style.opacity]="item.quantity >= item.stock ? 0.4 : 1">+</button>
+            </div>
+
+            <p *ngIf="item.quantity >= item.stock" class="text-warning small mb-1">
+              <i class="fas fa-exclamation-triangle"></i> Stock maximum atteint ({{ item.stock }} dispo)
+            </p>
+            <p *ngIf="item.quantity < item.stock" class="text-secondary small mb-1">
+              {{ item.stock - item.quantity }} restant(s) en stock
+            </p>
+
+            <div class="cart-item-price">{{ (item.price * item.quantity) | number:'1.2-2':'fr' }}€</div>
+          </div>
+          <button class="btn btn-link text-secondary" (click)="removeItem(item.id)">
+            <i class="fas fa-trash-alt"></i> Supprimer
+          </button>
+        </div>
+      </div>
+
+      <a routerLink="/games" class="btn btn-secondary w-100 mt-3">
+        <i class="fas fa-arrow-left"></i> Continuer vos achats
+      </a>
+    </div>
+
+    <div class="col-lg-4" *ngIf="cartItems.length > 0">
+      <div class="cart-summary">
+        <h5 class="mb-3">Résumé de la commande</h5>
+        <div class="summary-row"><span>Sous-total</span><span class="summary-value">{{ subtotal | number:'1.2-2':'fr' }}€</span></div>
+        <div class="summary-row"><span>Livraison</span><span class="summary-value">Gratuit</span></div>
+        <div class="summary-row"><span>Réduction</span><span class="summary-value text-success">-{{ discountAmount | number:'1.2-2':'fr' }}€</span></div>
+        <div class="summary-row total"><span>Total</span><span class="summary-value">{{ total | number:'1.2-2':'fr' }}€</span></div>
+        
+        <div class="my-3">
+          <div class="input-group input-group-sm">
+            <input type="text" [(ngModel)]="promoCode" class="form-control bg-secondary border-secondary text-white" placeholder="Code promo">
+            <button class="btn btn-outline-secondary" type="button" (click)="applyPromo()"><i class="fas fa-tag"></i> Appliquer</button>
+          </div>
+          <div class="small mt-1" [ngClass]="{'text-success': promoMessageType === 'success', 'text-danger': promoMessageType === 'danger'}">
+            {{ promoMessage }}
+          </div>
+        </div>
+
+        <button class="btn btn-checkout text-white" [disabled]="isCheckingOut" (click)="checkout()">
+          <span *ngIf="isCheckingOut" class="spinner-border spinner-border-sm me-2"></span>
+          <i *ngIf="!isCheckingOut" class="fas fa-lock"></i> Passer la commande
+        </button>
+        <p class="text-center text-secondary small mt-3 mb-0">
+          <i class="fas fa-shield-alt"></i> Paiement 100% sécurisé
+        </p>
+      </div>
+    </div>
+  </div>
+</main>

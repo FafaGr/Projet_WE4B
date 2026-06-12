@@ -29,7 +29,7 @@ export class GameListComponent implements OnInit {
   isLoading = false;
   hasError = false;
 
-  // AJOUT : feedback visuel bouton panier par jeu
+  
   cartFeedback: Record<number, string> = {};
 
   constructor(
@@ -86,7 +86,7 @@ export class GameListComponent implements OnInit {
     });
   }
 
-  // AJOUT : retourne le statut et gère le feedback visuel
+  
   addToCart(game: Game): void {
     const id     = game.id_jeu!;
     const status = this.cartService.addToCart(game);
