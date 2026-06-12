@@ -1,0 +1,82 @@
+<style>
+.auth-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #6366f1 100%); padding: 2rem 0; }
+.auth-card { background-color: var(--bg-card, #1a1a2e); border: 1px solid var(--border-color, #333); border-radius: 15px; max-width: 500px; width: 100%; padding: 3rem; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.form-control, .form-select { background-color: var(--secondary-dark, #2a2a3e) !important; border: 1px solid var(--border-color, #333) !important; color: var(--text-primary, #fff) !important; padding: 0.75rem 1rem; border-radius: 8px; }
+.form-control:focus { border-color: #dc3545 !important; box-shadow: 0 0 0 0.2rem rgba(220,53,69,.25); }
+.btn-auth { background-color: #dc3545; border: none; padding: 0.75rem 1.5rem; font-weight: 600; width: 100%; border-radius: 8px; }
+.password-strength { margin-top: 0.5rem; height: 4px; background-color: var(--border-color, #333); border-radius: 2px; overflow: hidden; }
+.password-strength-bar { height: 100%; transition: all 0.3s ease; }
+</style>
+
+<div class="auth-container">
+  <div class="auth-card">
+    <h2 class="text-white fw-bold">Créer un compte</h2>
+    <p class="text-muted mb-4">Rejoignez GameStore et commencez à économiser dès maintenant</p>
+
+    <!-- Succès -->
+    <div class="alert alert-success" *ngIf="success">
+      Compte créé avec succès !
+      <a routerLink="/login" class="alert-link">Se connecter</a>
+    </div>
+
+    <!-- Erreurs -->
+    <div class="alert alert-danger" *ngIf="errors.length > 0">
+      <ul class="mb-0">
+        <li *ngFor="let err of errors">{{ err }}</li>
+      </ul>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="submit()" *ngIf="!success">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label text-white">Prénom</label>
+          <input type="text" class="form-control" formControlName="firstName" placeholder="Jean">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label text-white">Nom</label>
+          <input type="text" class="form-control" formControlName="lastName" placeholder="Dupont">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label text-white">Adresse Email</label>
+        <input type="email" class="form-control" formControlName="email" placeholder="votre@email.com">
+      </div>
+      <div class="mb-3">
+        <label class="form-label text-white">Mot de passe</label>
+        <input type="password" class="form-control" formControlName="password" placeholder="••••••••">
+        <div class="password-strength">
+          <div class="password-strength-bar"
+               [style.width.%]="passwordStrength"
+               [style.background-color]="strengthColor">
+          </div>
+        </div>
+        <p class="small text-secondary mt-1">Minimum 8 caractères, majuscule, minuscule et chiffre</p>
+      </div>
+      <div class="mb-3">
+        <label class="form-label text-white">Confirmer le mot de passe</label>
+        <input type="password" class="form-control" formControlName="confirmPassword" placeholder="••••••••">
+      </div>
+      <div class="mb-3">
+        <label class="form-label text-white">Pays</label>
+        <select class="form-select" formControlName="country">
+          <option value="">Sélectionner...</option>
+          <option value="france">France</option>
+          <option value="belgique">Belgique</option>
+          <option value="suisse">Suisse</option>
+          <option value="luxembourg">Luxembourg</option>
+          <option value="other">Autre</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-auth btn-lg text-white" [disabled]="isLoading">
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+        Créer mon compte
+      </button>
+    </form>
+
+    <div class="text-center mt-3">
+      <p class="text-secondary">Déjà inscrit ?
+        <a routerLink="/login" class="text-danger fw-bold">Se connecter</a>
+      </p>
+    </div>
+  </div>
+</div>

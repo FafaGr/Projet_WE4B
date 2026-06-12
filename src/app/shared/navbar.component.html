@@ -1,0 +1,89 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-darker sticky-top border-bottom border-secondary">
+  <div class="container-fluid px-4">
+
+    <!-- Logo -->
+    <a class="navbar-brand fw-bold" routerLink="/games">
+      <i class="fas fa-gamepad text-danger"></i>
+      <span class="text-danger">Game</span>Store
+    </a>
+
+    <!-- Barre de recherche (desktop) -->
+    <div class="search-box-wrapper ms-3 flex-grow-1 d-none d-md-block">
+      <div class="input-group input-group-sm">
+        <input
+          type="text"
+          class="form-control bg-secondary border-0 text-white"
+          placeholder="Rechercher un jeu..."
+          [(ngModel)]="searchQuery"
+          (keyup)="onSearchKeyup($event)">
+        <button class="btn btn-danger" type="button" (click)="search()">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Toggler mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+
+        <!-- Admin -->
+        <li class="nav-item" *ngIf="(currentUser$ | async)?.role === 'admin'">
+          <a class="nav-link text-warning fw-bold" routerLink="/admin">🛠 Admin Panel</a>
+        </li>
+
+        <!-- Navigation plateforme -->
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/games"
+             [class.active]="!currentPlatform">Accueil</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/games" [queryParams]="{ platform: 'PC' }"
+             [class.active]="currentPlatform === 'PC'">PC</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/games" [queryParams]="{ platform: 'Console' }"
+             [class.active]="currentPlatform === 'Console'">Console</a>
+        </li>
+
+        <!-- Panier -->
+        <li class="nav-item">
+          <a class="nav-link position-relative" routerLink="/cart">
+            <i class="fas fa-shopping-cart"></i>
+            Panier
+            <span *ngIf="cartCount > 0"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                  style="font-size:0.6rem;">
+              {{ cartCount }}
+            </span>
+          </a>
+        </li>
+
+        <!-- Auth -->
+        <ng-container *ngIf="currentUser$ | async as user; else loginLink">
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/orders">
+              <i class="fas fa-receipt me-1"></i>Mes commandes
+            </a>
+          </li>
+          <li class="nav-item">
+            <button class="btn btn-link nav-link" (click)="logout()">
+              <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </button>
+          </li>
+        </ng-container>
+        <ng-template #loginLink>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login">
+              <i class="fas fa-sign-in-alt"></i> Connexion
+            </a>
+          </li>
+        </ng-template>
+
+      </ul>
+    </div>
+  </div>
+</nav>
