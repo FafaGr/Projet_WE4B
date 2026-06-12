@@ -14,7 +14,7 @@ export interface Game {
 @Component({
   selector: 'app-games-grid',
   templateUrl: './games-grid.component.html',
-  styleUrls: ['../app.component.css']
+  styleUrls: ['../../app.component.css']
 })
 export class GamesGridComponent implements OnInit {
 // Le tableau qui contiendra tes jeux

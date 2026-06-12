@@ -1,0 +1,75 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2 class="text-white">Connexion</h2>
+    <p class="text-muted">Connectez-vous pour accéder à votre compte</p>
+
+    <?php if($error): ?>
+    <div class="alert alert-danger py-2 text-center" style="font-size: 0.85rem;">
+      <?= $error ?>
+    </div>
+    <?php endif; ?>
+
+    <div class="social-login">
+      <button class="btn-social">
+        <i class="fab fa-google"></i> Google
+      </button>
+      <button class="btn-social">
+        <i class="fab fa-github"></i> GitHub
+      </button>
+    </div>
+
+    <div class="divider">
+      <span>Ou connectez-vous</span>
+    </div>
+
+    <form method="POST" action="">
+      <div class="mb-3">
+        <label for="email" class="form-label">Adresse Email</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          name="email"
+          placeholder="votre@email.com"
+          required
+        >
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Mot de passe</label>
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          name="password"
+          placeholder="••••••••"
+          required
+        >
+      </div>
+
+      <div class="remember-me">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="remember" name="remember">
+          <label class="form-check-label" for="remember">
+            Se souvenir de moi
+          </label>
+        </div>
+        <a href="#" class="forgot-password">Mot de passe oublié?</a>
+      </div>
+
+      <button type="submit" class="btn btn-auth btn-lg mt-2 text-white">Connexion</button>
+    </form>
+
+    <div class="auth-link">
+      <p class="text-secondary">
+        Pas encore de compte?
+        <a routerLink='/inscription'>Créer un compte</a>
+      </p>
+    </div>
+
+    <p class="text-center text-secondary small mt-4 mb-0">
+      En vous connectant, vous acceptez nos
+      <a href="#" class="text-danger text-decoration-none">conditions d'utilisation</a>
+    </p>
+  </div>
+</div>

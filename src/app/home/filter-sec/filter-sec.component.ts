@@ -8,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 @Component({
   selector: 'app-filter-sec',
   templateUrl: './filter-sec.component.html',
-  styleUrls: ['../app.component.css']
+  styleUrls: ['../../app.component.css']
 })
 export class FilterSecComponent implements OnInit {
   // Vos variables de recherche et de filtres (le fameux Data Binding bidirectionnel)

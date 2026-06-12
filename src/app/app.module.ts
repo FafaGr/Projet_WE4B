@@ -5,10 +5,15 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
 import { BottomBarComponent } from './bottom-bar/bottom-bar.component';
-import { BannerBgComponent } from './banner-bg/banner-bg.component';
-import { FilterSecComponent } from './filter-sec/filter-sec.component';
+import { BannerBgComponent } from './home/banner-bg/banner-bg.component';
+import { FilterSecComponent } from './home/filter-sec/filter-sec.component';
 import {FormsModule} from "@angular/forms";
-import { GamesGridComponent } from './games-grid/games-grid.component';
+import { GamesGridComponent } from './home/games-grid/games-grid.component';
+import { ConnexionFormComponent } from './sign-in/connexion-form/connexion-form.component';
+import { ConnexionComponent } from './sign-in/connexion/connexion.component';
+import { HomepageComponent } from './home/homepage/homepage.component';
+import { InscriptionComponent } from './sign-up/inscription/inscription.component';
+import { InscriptionFormComponent } from './sign-up/inscription-form/inscription-form.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +22,12 @@ import { GamesGridComponent } from './games-grid/games-grid.component';
     BottomBarComponent,
     BannerBgComponent,
     FilterSecComponent,
-    GamesGridComponent
+    GamesGridComponent,
+    ConnexionFormComponent,
+    ConnexionComponent,
+    HomepageComponent,
+    InscriptionComponent,
+    InscriptionFormComponent
   ],
   imports: [
     BrowserModule,
