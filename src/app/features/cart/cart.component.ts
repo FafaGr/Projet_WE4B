@@ -92,7 +92,7 @@ export class CartComponent implements OnInit {
     this.isCheckingOut = true;
 
     // Envoi des données vers ton API PHP actuelle (CartController::checkout)
-    this.http.post<{ success: boolean; error?: string }>('panier.php?action=checkout', {
+    this.http.post<{ success: boolean; error?: string }>('http://localhost/gamestore/panier.php', {
       cart: this.cartItems
     }).subscribe({
       next: (res) => {

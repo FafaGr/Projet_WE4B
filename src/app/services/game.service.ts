@@ -4,11 +4,18 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Game, GameFilters } from '../models/game.model';
 
+export interface GameDetailResponse {
+  jeu: Game;
+  plateformes: { nom_plateforme: string }[];
+  avis: any[];
+  noteMoyenne: number | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GameService {
 
-  
   private apiUrl = 'http://localhost/WE4B/api/games.php';
+  private detailApiUrl = 'http://localhost/WE4B/api/game-detail.php';
 
   constructor(private http: HttpClient) {}
 
@@ -25,16 +32,34 @@ export class GameService {
     return this.http.get<Game[]>(this.apiUrl, { params }).pipe(
       map(games => games.map(g => ({
         ...g,
-        // MySQL renvoie les nombres en string — on les force en number
         prix:        +g.prix,
         ancien_prix: g.ancien_prix != null ? +g.ancien_prix : null,
         stock:       +g.stock,
         note:        g.note != null ? +g.note : undefined,
-        // GROUP_CONCAT génère des doublons quand un jeu a plusieurs JOIN — on les supprime
         categories_noms: g.categories_noms
           ? [...new Set(g.categories_noms.split(', '))].join(', ')
           : undefined,
       })))
+    );
+  }
+
+  getById(id: number): Observable<GameDetailResponse> {
+    let params = new HttpParams().set('id', id.toString());
+
+    return this.http.get<GameDetailResponse>(this.detailApiUrl, { params }).pipe(
+      map(res => ({
+        ...res,
+        jeu: {
+          ...res.jeu,
+          prix:        +res.jeu.prix,
+          ancien_prix: res.jeu.ancien_prix != null ? +res.jeu.ancien_prix : null,
+          stock:       +res.jeu.stock,
+          note:        res.jeu.note != null ? +res.jeu.note : undefined,
+          categories_noms: res.jeu.categories_noms
+            ? [...new Set(res.jeu.categories_noms.split(', '))].join(', ')
+            : undefined,
+        }
+      }))
     );
   }
 }
