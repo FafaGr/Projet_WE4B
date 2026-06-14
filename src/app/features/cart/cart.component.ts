@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CartService, CartItem } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -40,10 +41,14 @@ export class CartComponent implements OnInit {
     'WELCOME': 15,
   };
 
-  constructor(private cartService: CartService, private http: HttpClient) {}
+  constructor(
+    private cartService: CartService,
+    private authService: AuthService,
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    // Écoute en temps réel des modifications du panier (RxJS)
     this.cartService.cartItems$.subscribe(items => {
       this.cartItems = items;
     });
@@ -89,11 +94,20 @@ export class CartComponent implements OnInit {
   checkout(): void {
     if (this.cartItems.length === 0) return;
 
+    // Vérifie que l'utilisateur est connecté
+    const user = this.authService.currentUser();
+    if (!user) {
+      alert('Vous devez être connecté pour passer une commande.');
+      this.router.navigate(['/login']);
+      return;
+    }
+
     this.isCheckingOut = true;
 
-    // Envoi des données vers ton API PHP actuelle (CartController::checkout)
-    this.http.post<{ success: boolean; error?: string }>('http://localhost/gamestore/panier.php', {
-      cart: this.cartItems
+    // Appel vers l'API checkout.php
+    this.http.post<{ success: boolean; error?: string }>('http://localhost/WE4B/api/checkout.php', {
+      cart:    this.cartItems,
+      user_id: user.id_user
     }).subscribe({
       next: (res) => {
         if (res.success) {
@@ -104,10 +118,11 @@ export class CartComponent implements OnInit {
         }
         this.isCheckingOut = false;
       },
-      error: () => {
-        alert('Erreur réseau. Est-ce que le fichier panier.php est joignable ?');
+      error: (err) => {
+        alert(err.error?.error || 'Erreur réseau. Vérifier que XAMPP est démarré');
         this.isCheckingOut = false;
       }
     });
+    this.router.navigate(['/']);
   }
 }

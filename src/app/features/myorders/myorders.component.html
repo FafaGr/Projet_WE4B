@@ -1,0 +1,87 @@
+<div class="container py-5 text-white">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h2 class="fw-bold mb-1"><i class="fas fa-receipt text-danger me-2"></i>Mes commandes</h2>
+      <p class="text-secondary mb-0">Bonjour {{ userName }}, voici l'historique de vos achats.</p>
+    </div>
+    <a routerLink="/games" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-1"></i> Retour à la boutique
+    </a>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center py-5">
+    <span class="spinner-border text-danger"></span>
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+
+    <!-- Aucune commande -->
+    <div *ngIf="commandes.length === 0" class="text-center py-5">
+      <i class="fas fa-box-open fa-4x text-secondary mb-3 d-block"></i>
+      <h5 class="text-secondary">Vous n'avez pas encore passé de commande.</h5>
+      <a routerLink="/games" class="btn btn-danger mt-3">Découvrir les jeux</a>
+    </div>
+
+    <ng-container *ngIf="commandes.length > 0">
+
+      <!-- Résumé -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card bg-dark border-secondary p-3 text-center">
+            <div class="text-danger fw-bold fs-4">{{ commandes.length }}</div>
+            <div class="text-secondary small">
+              Achat{{ commandes.length > 1 ? 's' : '' }} effectué{{ commandes.length > 1 ? 's' : '' }}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card bg-dark border-secondary p-3 text-center">
+            <div class="text-success fw-bold fs-4">{{ totalDepense | number:'1.2-2':'fr' }} €</div>
+            <div class="text-secondary small">Total dépensé</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card bg-dark border-secondary p-3 text-center">
+            <div class="text-warning fw-bold fs-4">{{ totalJeux }}</div>
+            <div class="text-secondary small">
+              Jeu{{ totalJeux > 1 ? 'x' : '' }} commandé{{ totalJeux > 1 ? 's' : '' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste des commandes -->
+      <div class="d-flex flex-column gap-3">
+        <div class="card bg-dark border-secondary" *ngFor="let cmd of commandes">
+          <div class="card-body d-flex align-items-center gap-4">
+
+            <img *ngIf="cmd.image_url" [src]="cmd.image_url" [alt]="cmd.jeu_titre"
+                 class="rounded" style="width:80px; height:60px; object-fit:cover; flex-shrink:0;">
+            <div *ngIf="!cmd.image_url" class="rounded bg-secondary d-flex align-items-center justify-content-center"
+                 style="width:80px; height:60px; flex-shrink:0;">
+              <i class="fas fa-gamepad text-muted"></i>
+            </div>
+
+            <div class="flex-grow-1">
+              <h6 class="mb-1 fw-semibold">{{ cmd.jeu_titre }}</h6>
+              <div class="text-secondary small">
+                <i class="fas fa-calendar-alt me-1"></i>
+                {{ cmd.date_com | date:'dd/MM/yyyy à HH:mm' }}
+                &nbsp;·&nbsp;
+                Quantité : <strong>{{ cmd.qty }}</strong>
+                &nbsp;·&nbsp;
+                Prix unit. : <strong>{{ cmd.jeu_prix | number:'1.2-2'}} €</strong>
+              </div>
+            </div>
+
+            <div class="text-end" style="flex-shrink:0;">
+              <div class="text-success fw-bold fs-5">{{ cmd.total_ligne | number:'1.2-2':'fr' }} €</div>
+              <div class="text-secondary small">Total</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+  </ng-container>
+</div>
