@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Game, GameFilters } from '../models/game.model';
+import { Review } from '../models/review.model';
 
 export interface GameDetailResponse {
   jeu: Game;
@@ -41,6 +42,12 @@ export class GameService {
           : undefined,
       })))
     );
+  }
+
+  private reviewApiUrl = 'http://localhost/WE4B/api/post_review.php';
+
+  postReview(review: Review): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(this.reviewApiUrl, review);
   }
 
   getById(id: number): Observable<GameDetailResponse> {

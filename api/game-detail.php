@@ -72,7 +72,11 @@ try {
     $stmtAvis->execute([$id]);
     $avis = $stmtAvis->fetchAll();
 
-    $noteMoyenne = $jeu['note'] ? round($jeu['note'], 1) : null;
+    $noteMoyenne = null;
+        if (count($avis) > 0) {
+            $somme = array_sum(array_column($avis, 'note'));
+            $noteMoyenne = round($somme / count($avis), 1);
+        }
 
     echo json_encode([
         'jeu' => $jeu,

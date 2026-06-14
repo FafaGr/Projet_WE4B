@@ -4,11 +4,14 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { switchMap, filter, map, take } from 'rxjs/operators';
 import { GameService, GameDetailResponse } from '../services/game.service';
 import { CartService } from '../services/cart.service';
+import { AuthService } from '../services/auth.service';
+import { Review } from '../models/review.model';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-game-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './game-detail.component.html',
 })
 export class GameDetailComponent implements OnInit {
@@ -17,13 +20,64 @@ export class GameDetailComponent implements OnInit {
   isLoading = true;
   hasError = false;
   cartFeedback: string = 'idle';
+  newReview: { note: number; com: string } = { note: 5, com: '' };
+  isSubmitting = false;
+  reviewError = '';
+  reviewSuccess = false;
 
   constructor(
     private route: ActivatedRoute,
     private gameService: GameService,
     private cartService: CartService,
+    private authService: AuthService,   // ← ajouter
     private cdr: ChangeDetectorRef
   ) {}
+
+  get isAuthenticated(): boolean {
+    return this.authService.isAuthenticated();
+  }
+
+  get currentUser() {
+    return this.authService.currentUser();
+  }
+
+  submitReview(): void {
+    if (!this.detailData || !this.currentUser) return;
+    this.isSubmitting = true;
+    this.reviewError = '';
+
+    const review: Review = {
+      id_utilisateur: this.currentUser.id_user,
+      id_jeu: this.detailData.jeu.id_jeu!,
+      com: this.newReview.com.trim(),
+      note: this.newReview.note,
+    };
+
+    this.gameService.postReview(review).subscribe({
+      next: () => {
+        this.reviewSuccess = true;
+        this.isSubmitting = false;
+        this.newReview = { note: 5, com: '' };
+        // Recharger les avis
+        this.gameService.getById(this.detailData!.jeu.id_jeu!).subscribe(data => {
+          this.detailData = data;
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+          this.reviewError = err.status === 409
+          ? 'Vous avez déjà posté un avis pour ce jeu.'
+          : 'Erreur lors de l\'envoi. Réessayez.';
+          this.isSubmitting = false;
+          this.cdr.detectChanges();
+      }
+    });
+  }
+  
+  get hasAlreadyReviewed(): boolean {
+  if (!this.detailData || !this.currentUser) return false;
+  return this.detailData.avis.some(av => av.id_utilisateur === this.currentUser!.id_user);
+}
 
   ngOnInit(): void {
     this.route.paramMap.pipe(

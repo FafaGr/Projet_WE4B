@@ -21,13 +21,10 @@
           
           <div class="d-flex align-items-center gap-3 my-3 p-3 rounded" style="background-color: #11111e;">
             <span class="text-warning fs-5">
-              <span *ngFor="let star of getStars(detailData.noteMoyenne || 0)">
-                <i [ngClass]="{
-                  'fas fa-star': star === 'full',
-                  'fas fa-star-half-alt': star === 'half',
-                  'far fa-star': star === 'empty'
-                }"></i>
-              </span>
+              <span *ngFor="let star of getStars(detailData.noteMoyenne ?? 0)">
+  <i [ngClass]="star === 'half' ? 'fas fa-star-half-alt' : 'fas fa-star'"
+     [style.opacity]="star === 'empty' ? 0.2 : 1"></i>
+</span>
             </span>
             <span *ngIf="detailData.noteMoyenne" class="text-secondary">
               {{ detailData.noteMoyenne }}/5 ({{ detailData.avis.length }} avis)
@@ -113,23 +110,74 @@
     </div>
 
     <div class="mt-5">
-      <h3 class="mb-4">Avis des joueurs</h3>
-      
-      <div *ngFor="let av of detailData.avis" class="p-4 rounded mb-3" style="background-color: #1e1e2f; border: 1px solid #2d2d3f;">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <strong><i class="fas fa-user-circle text-danger me-2"></i>{{ av.nom }}</strong>
-          <span class="text-warning">
-            <span *ngFor="let star of getStars(av.note)"><i class="fas fa-star" [style.opacity]="star === 'full' ? 1 : 0.2"></i></span>
-            <span class="text-secondary small ms-2">{{ av.note }}/5</span>
-          </span>
-        </div>
-        <p class="text-secondary mb-0" style="white-space: pre-line;">{{ av.com }}</p>
-      </div>
+  <h3 class="mb-4">Avis des joueurs</h3>
 
-      <div *ngIf="detailData.avis.length === 0" class="text-secondary text-center py-4">
-        <i class="fas fa-comment-slash fa-2x mb-3 d-block"></i>
-        Aucun avis pour ce jeu pour l'instant.
+  <!-- Formulaire de soumission -->
+  <div *ngIf="isAuthenticated" class="p-4 rounded mb-4" style="background-color: #1e1e2f; border: 1px solid #2d2d3f;">
+    <h5 class="mb-3"><i class="fas fa-pen text-danger me-2"></i>Laisser un avis</h5>
+
+    <div *ngIf="reviewSuccess" class="alert alert-success">Avis posté avec succès !</div>
+    <div *ngIf="reviewError" class="alert alert-danger">{{ reviewError }}</div>
+
+    <div class="mb-3">
+      <label class="form-label text-secondary small">Note</label>
+      <div class="d-flex gap-2">
+        <button *ngFor="let n of [1,2,3,4,5]" type="button"
+          class="btn btn-sm"
+          [ngClass]="n <= newReview.note ? 'btn-warning' : 'btn-outline-secondary'"
+          (click)="newReview.note = n">
+          <i class="fas fa-star"></i> {{ n }}
+        </button>
       </div>
     </div>
+
+    <div class="mb-3">
+      <label class="form-label text-secondary small">Commentaire</label>
+      <textarea class="form-control bg-dark text-white border-secondary"
+                rows="3"
+                [(ngModel)]="newReview.com"
+                placeholder="Partagez votre expérience...">
+      </textarea>
+    </div>
+
+    <button class="btn btn-danger"
+            [disabled]="isSubmitting || !newReview.com.trim()"
+            (click)="submitReview()">
+      <span *ngIf="!isSubmitting"><i class="fas fa-paper-plane me-1"></i>Publier</span>
+      <span *ngIf="isSubmitting"><i class="fas fa-spinner fa-spin me-1"></i>Envoi...</span>
+    </button>
+  </div>
+
+  <!-- Message si non connecté -->
+  <div *ngIf="!isAuthenticated" class="p-3 rounded mb-4 text-secondary text-center" style="background-color: #1e1e2f; border: 1px dashed #2d2d3f;">
+    <i class="fas fa-lock me-2"></i>
+    <a routerLink="/login" class="text-danger">Connectez-vous</a> pour laisser un avis.
+  </div>
+  <div *ngIf="isAuthenticated && hasAlreadyReviewed" 
+     class="p-3 rounded mb-4 text-center"
+     style="background-color: #1e1e2f; border: 1px dashed #2d2d3f;">
+  <i class="fas fa-check-circle text-success me-2"></i>
+  <span class="text-secondary">Vous avez déjà posté un avis pour ce jeu.</span>
+</div>
+
+  <!-- Liste des avis (inchangée) -->
+<div *ngFor="let av of detailData.avis" class="p-4 rounded mb-3" style="background-color: #1e1e2f; border: 1px solid #2d2d3f;">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <strong><i class="fas fa-user-circle text-danger me-2"></i>{{ av.nom }}</strong>
+    <span class="text-warning">
+      <span *ngFor="let star of getStars(av.note)">
+        <i class="fas fa-star" [style.opacity]="star === 'full' ? 1 : 0.2"></i>
+      </span>
+      <span class="text-secondary small ms-2">{{ av.note }}/5</span>
+    </span>
+  </div>
+  <p class="text-secondary mb-0" style="white-space: pre-line;">{{ av.com }}</p>
+</div>
+
+<div *ngIf="detailData.avis.length === 0" class="text-secondary text-center py-4">
+  <i class="fas fa-comment-slash fa-2x mb-3 d-block"></i>
+  Aucun avis pour ce jeu pour l'instant.
+</div>
+</div>
   </main>
 </div>
