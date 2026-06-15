@@ -1,14 +1,13 @@
 <?php
-// api/orders.php — À placer dans htdocs/WE4B/api/
-header('Access-Control-Allow-Origin: http://localhost:4200');
+header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 header('Content-Type: application/json; charset=utf-8');
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
 
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'gamestore_db'); // ← ton nom de BDD
+define('DB_NAME', 'gamestore_db'); 
 define('DB_USER', 'root');
 define('DB_PASS', '');
 
@@ -18,25 +17,36 @@ try {
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Connexion BDD échouée']);
+    echo json_encode(['error' => 'Connexion BDD échouée : ' . $e->getMessage()]);
     exit;
 }
 
-$userId = (int)($_GET['user_id'] ?? 0);
-if ($userId <= 0) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Utilisateur non authentifié.']);
-    exit;
+$userId = isset($_GET['user_id']) ? (int)$_GET['user_id'] : 0;
+
+if ($userId > 0) {
+    // Mode Historique Utilisateur classique
+    $stmt = $pdo->prepare(
+        "SELECT c.id_com, c.qty, c.date_com,
+                j.titre AS jeu_titre, j.prix AS jeu_prix, j.image_url,
+                (c.qty * j.prix) AS total_ligne
+         FROM commandes c
+         JOIN jeux j ON j.id_jeu = c.id_jeu
+         WHERE c.id_user = ?
+         ORDER BY c.date_com DESC"
+    );
+    $stmt->execute([$userId]);
+} else {
+    
+    $stmt = $pdo->query(
+        "SELECT c.id_com, c.qty, c.date_com,
+                j.titre AS jeu_titre, j.prix AS jeu_prix, j.image_url,
+                (c.qty * j.prix) AS total_ligne,
+                u.nom AS user_nom, u.email AS user_email
+         FROM commandes c
+         JOIN jeux j ON j.id_jeu = c.id_jeu
+         JOIN utilisateurs u ON u.id_user = c.id_user
+         ORDER BY c.date_com DESC"
+    );
 }
 
-$stmt = $pdo->prepare(
-    "SELECT c.id_com, c.qty, c.date_com,
-            j.titre AS jeu_titre, j.prix AS jeu_prix, j.image_url,
-            (c.qty * j.prix) AS total_ligne
-     FROM commandes c
-     JOIN jeux j ON j.id_jeu = c.id_jeu
-     WHERE c.id_user = ?
-     ORDER BY c.date_com DESC"
-);
-$stmt->execute([$userId]);
 echo json_encode($stmt->fetchAll());

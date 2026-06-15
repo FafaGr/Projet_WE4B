@@ -7,7 +7,7 @@ import { OrderLine } from '../models/order.model';
 @Injectable({ providedIn: 'root' })
 export class OrderService {
 
-  private apiUrl = 'http://localhost/WE4B/api'; // ← même base que game.service.ts
+  private apiUrl = 'http://localhost/WE4B/api';
 
   constructor(private http: HttpClient) {}
 

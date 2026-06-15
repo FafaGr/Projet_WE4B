@@ -1,0 +1,177 @@
+<div class="container py-5">
+
+  <div class="row mb-4">
+    <div class="col-12 col-md-6">
+      <h2 class="fw-bold text-white">Gestion du catalogue</h2>
+      <p class="text-secondary mb-0">
+        {{ games.length }} jeu(x) au total — gérez votre catalogue directement depuis ce tableau.
+      </p>
+    </div>
+    <div class="col-12 col-md-6 d-flex flex-column flex-md-row gap-2 justify-content-md-end align-items-md-center mt-3 mt-md-0">
+      <input
+        type="text"
+        class="form-control bg-dark text-white border-secondary"
+        style="max-width: 280px;"
+        placeholder="Rechercher un jeu..."
+        [(ngModel)]="search"
+      >
+      <button class="btn btn-success text-nowrap" (click)="startCreate()" *ngIf="!isCreating">
+        <i class="fas fa-plus me-2"></i>Ajouter un jeu
+      </button>
+      <a routerLink="/admin" class="btn btn-outline-secondary text-nowrap">
+        <i class="fas fa-arrow-left me-2"></i>Retour
+      </a>
+    </div>
+  </div>
+
+  <div *ngIf="successMsg" class="alert alert-success d-flex align-items-center">
+    <i class="fas fa-check-circle me-2"></i>{{ successMsg }}
+  </div>
+  <div *ngIf="errorMsg" class="alert alert-danger d-flex align-items-center">
+    <i class="fas fa-exclamation-triangle me-2"></i>{{ errorMsg }}
+  </div>
+
+  <div *ngIf="isCreating" class="bg-secondary bg-opacity-10 border border-success rounded p-4 mb-4">
+    <h4 class="text-success fw-bold mb-3"><i class="fas fa-plus-circle me-2"></i>Nouveau jeu</h4>
+    <div class="row g-3">
+      <div class="col-12 col-lg-4">
+        <label class="form-label text-secondary small">Titre</label>
+        <input type="text" class="form-control bg-dark text-white border-secondary" [(ngModel)]="editForm.titre">
+      </div>
+      <div class="col-12 col-lg-4">
+        <label class="form-label text-secondary small">Image (URL)</label>
+        <input type="text" class="form-control bg-dark text-white border-secondary" [(ngModel)]="editForm.image_url">
+      </div>
+      <div class="col-6 col-lg-2">
+        <label class="form-label text-secondary small">Prix (€)</label>
+        <input type="number" step="0.01" min="0" class="form-control bg-dark text-white border-secondary" [(ngModel)]="editForm.prix">
+      </div>
+      <div class="col-6 col-lg-2">
+        <label class="form-label text-secondary small">Ancien prix (€)</label>
+        <input type="number" step="0.01" min="0" class="form-control bg-dark text-white border-secondary" [(ngModel)]="editForm.ancien_prix">
+      </div>
+      <div class="col-6 col-lg-2">
+        <label class="form-label text-secondary small">Stock</label>
+        <input type="number" min="0" class="form-control bg-dark text-white border-secondary" [(ngModel)]="editForm.stock">
+      </div>
+      <div class="col-12">
+        <label class="form-label text-secondary small">Description</label>
+        <textarea class="form-control bg-dark text-white border-secondary" rows="3" [(ngModel)]="editForm.description"></textarea>
+      </div>
+    </div>
+    <div class="mt-3 d-flex gap-2">
+      <button class="btn btn-success" [disabled]="saving" (click)="saveCreate()">
+        <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+        <i *ngIf="!saving" class="fas fa-check me-1"></i>Créer le jeu
+      </button>
+      <button class="btn btn-outline-secondary" [disabled]="saving" (click)="cancelCreate()">Annuler</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center text-secondary py-5">
+    <i class="fas fa-spinner fa-spin fa-2x"></i>
+    <p class="mt-3">Chargement du catalogue...</p>
+  </div>
+
+  <div *ngIf="!loading" class="table-responsive">
+    <table class="table table-dark table-hover align-middle border-secondary">
+      <thead>
+        <tr>
+          <th style="width: 70px;">Image</th>
+          <th>Titre</th>
+          <th class="d-none d-lg-table-cell">Catégories</th>
+          <th class="text-end" style="width: 110px;">Prix</th>
+          <th class="text-end d-none d-md-table-cell" style="width: 120px;">Ancien prix</th>
+          <th class="text-center" style="width: 90px;">Stock</th>
+          <th class="text-center d-none d-sm-table-cell" style="width: 80px;">Note</th>
+          <th class="text-end" style="width: 200px;">Actions</th> </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let game of filteredGames">
+
+          <tr *ngIf="editingId !== game.id_jeu">
+            <td>
+              <img *ngIf="game.image_url" [src]="game.image_url" [alt]="game.titre" class="rounded border border-secondary" style="width: 50px; height: 50px; object-fit: cover;">
+              <div *ngIf="!game.image_url" class="rounded border border-secondary d-flex align-items-center justify-content-center text-secondary" style="width: 50px; height: 50px;">
+                <i class="fas fa-image"></i>
+              </div>
+            </td>
+            <td class="text-white">{{ game.titre }}</td>
+            <td class="d-none d-lg-table-cell">
+              <small class="text-secondary">{{ game.categories_noms || '—' }}</small>
+            </td>
+            <td class="text-end text-white">{{ game.prix | number:'1.2-2' }} €</td>
+            <td class="text-end text-secondary d-none d-md-table-cell">
+              <span *ngIf="game.ancien_prix">{{ game.ancien_prix | number:'1.2-2' }} €</span>
+              <span *ngIf="!game.ancien_prix">—</span>
+            </td>
+            <td class="text-center text-white">
+              {{ game.stock }}
+            </td>
+            <td class="text-center text-secondary d-none d-sm-table-cell">
+              {{ game.note ?? '—' }}
+            </td>
+            <td class="text-end">
+              <div class="d-flex gap-2 justify-content-end">
+                <button class="btn btn-sm btn-outline-primary" (click)="startEdit(game)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteGame(game)">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="editingId === game.id_jeu">
+            <td colspan="8" class="p-0">
+              <div class="bg-secondary bg-opacity-10 border-top border-bottom border-secondary p-3">
+                <div class="row g-3">
+                  <div class="col-12 col-lg-4">
+                    <label class="form-label text-secondary small">Titre</label>
+                    <input type="text" class="form-control bg-dark text-white border-secondary" [(ngModel)]="editForm.titre">
+                  </div>
+                  <div class="col-12 col-lg-4">
+                    <label class="form-label text-secondary small">Image (URL)</label>
+                    <input type="text" class="form-control bg-dark text-white border-secondary" [(ngModel)]="editForm.image_url">
+                  </div>
+                  <div class="col-6 col-lg-2">
+                    <label class="form-label text-secondary small">Prix (€)</label>
+                    <input type="number" step="0.01" min="0" class="form-control bg-dark text-white border-secondary" [(ngModel)]="editForm.prix">
+                  </div>
+                  <div class="col-6 col-lg-2">
+                    <label class="form-label text-secondary small">Ancien prix (€)</label>
+                    <input type="number" step="0.01" min="0" class="form-control bg-dark text-white border-secondary" [(ngModel)]="editForm.ancien_prix">
+                  </div>
+                  <div class="col-6 col-lg-2">
+                    <label class="form-label text-secondary small">Stock</label>
+                    <input type="number" min="0" class="form-control bg-dark text-white border-secondary" [(ngModel)]="editForm.stock">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label text-secondary small">Description</label>
+                    <textarea class="form-control bg-dark text-white border-secondary" rows="3" [(ngModel)]="editForm.description"></textarea>
+                  </div>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                  <button class="btn btn-success" [disabled]="saving" (click)="saveEdit(game)">
+                    <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+                    <i *ngIf="!saving" class="fas fa-check me-1"></i>Enregistrer
+                  </button>
+                  <button class="btn btn-outline-secondary" [disabled]="saving" (click)="cancelEdit()">Annuler</button>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+        </ng-container>
+
+        <tr *ngIf="filteredGames.length === 0">
+          <td colspan="8" class="text-center text-secondary py-4">
+            Aucun jeu ne correspond à votre recherche.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

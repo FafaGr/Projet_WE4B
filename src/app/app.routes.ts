@@ -5,6 +5,8 @@ import { RegisterComponent } from './features/register/register.component';
 import { CartComponent } from './features/cart/cart.component';
 import { GameDetailComponent } from './features/game-detail.component';
 import { MyOrdersComponent } from './features/myorders/myorders.component';
+import { AdminDashboardComponent } from './features/admin-dashboard/admin-dashboard.component';
+import { AdminGamesComponent } from './features/admin-games/admin-games.component';
 
 export const routes: Routes = [
   { path: '',         redirectTo: 'games', pathMatch: 'full' },
@@ -14,4 +16,6 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'cart',     component: CartComponent },
   { path: 'orders',   component: MyOrdersComponent },
+  { path: 'admin',    component: AdminDashboardComponent },
+  { path: 'admin/games',       component: AdminGamesComponent },
 ];
