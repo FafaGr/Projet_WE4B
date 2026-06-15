@@ -16,7 +16,17 @@ export class OrderService {
     return this.http.get<OrderLine[]>(`${this.apiUrl}/orders.php`, { params }).pipe(
       map(orders => orders.map(o => ({
         ...o,
-        
+        jeu_prix:    +o.jeu_prix,
+        total_ligne: +o.total_ligne,
+        qty:         +o.qty,
+      })))
+    );
+  }
+
+  getAllOrders(): Observable<OrderLine[]> {
+    return this.http.get<OrderLine[]>(`${this.apiUrl}/orders.php`).pipe(
+      map(orders => orders.map(o => ({
+        ...o,
         jeu_prix:    +o.jeu_prix,
         total_ligne: +o.total_ligne,
         qty:         +o.qty,

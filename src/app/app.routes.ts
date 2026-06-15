@@ -7,6 +7,7 @@ import { GameDetailComponent } from './features/game-detail.component';
 import { MyOrdersComponent } from './features/myorders/myorders.component';
 import { AdminDashboardComponent } from './features/admin-dashboard/admin-dashboard.component';
 import { AdminGamesComponent } from './features/admin-games/admin-games.component';
+import { AdminCommandesComponent } from './features/admin-commandes/admin-commandes.component';
 
 export const routes: Routes = [
   { path: '',         redirectTo: 'games', pathMatch: 'full' },
@@ -18,4 +19,5 @@ export const routes: Routes = [
   { path: 'orders',   component: MyOrdersComponent },
   { path: 'admin',    component: AdminDashboardComponent },
   { path: 'admin/games',       component: AdminGamesComponent },
+  { path: 'admin/commandes',       component: AdminCommandesComponent },
 ];
