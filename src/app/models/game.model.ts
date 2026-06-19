@@ -5,6 +5,7 @@ export interface Game {
   prix: number;
   ancien_prix?: number | null;
   stock: number;
+  plateforme : string;
   image_url: string;
   nouveau: boolean | number;
   note?: number;

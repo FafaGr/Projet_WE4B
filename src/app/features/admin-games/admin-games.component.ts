@@ -13,19 +13,24 @@ import { Game } from '../../models/game.model';
 })
 export class AdminGamesComponent implements OnInit {
   games: Game[] = [];
+  
+  // Stockage des listes d'options de ton fichier SQL
+  categories: any[] = [];
+  plateformes: any[] = []; 
+  
   loading = true;
-
   errorMsg = '';
   successMsg = '';
-
   search = '';
 
   editingId: number | null = null;
-  editForm: Partial<Game> = {};
+  editForm: any = {}; 
   saving = false;
-
-  // Variables pour la création
   isCreating = false;
+
+  // Tableaux temporaires pour stocker les sélections d'un ajout de jeu
+  selectedCategories: number[] = [];
+  selectedPlateformes: number[] = [];
 
   constructor(
     private gameService: GameService,
@@ -33,6 +38,24 @@ export class AdminGamesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Correspondance exacte avec le dump SQL de ta table `categories`
+    this.categories = [
+      { id_cat: 1, libelle: 'RPG' },
+      { id_cat: 2, libelle: 'OpenWorld' },
+      { id_cat: 3, libelle: 'Action' },
+      { id_cat: 4, libelle: 'Aventure' },
+      { id_cat: 5, libelle: 'FPS' }
+    ];
+
+    // Correspondance exacte avec le dump SQL de ta table `plateforme`
+    this.plateformes = [
+      { id_plateforme: 1, nom_plateforme: 'PC' },
+      { id_plateforme: 2, nom_plateforme: 'PS4' },
+      { id_plateforme: 3, nom_plateforme: 'PS5' },
+      { id_plateforme: 4, nom_plateforme: 'Xbox Series X' },
+      { id_plateforme: 5, nom_plateforme: 'Nintendo Switch' }
+    ];
+
     this.loadGames();
   }
 
@@ -65,7 +88,7 @@ export class AdminGamesComponent implements OnInit {
 
   // --- ACTIONS DE MODIFICATION ---
   startEdit(game: Game): void {
-    this.cancelCreate(); // Ferme le formulaire d'ajout si ouvert
+    this.cancelCreate();
     this.editingId = game.id_jeu ?? null;
     this.editForm = {
       titre: game.titre,
@@ -74,6 +97,7 @@ export class AdminGamesComponent implements OnInit {
       prix: game.prix,
       ancien_prix: game.ancien_prix,
       stock: game.stock,
+      nouveau: game.nouveau ?? 0
     };
     this.successMsg = '';
     this.errorMsg = '';
@@ -113,15 +137,18 @@ export class AdminGamesComponent implements OnInit {
 
   // --- ACTIONS DE CRÉATION ---
   startCreate(): void {
-    this.cancelEdit(); // Ferme une édition en cours si ouverte
+    this.cancelEdit();
     this.isCreating = true;
+    this.selectedCategories = [];
+    this.selectedPlateformes = [];
     this.editForm = {
       titre: '',
       description: '',
       image_url: '',
       prix: 0,
       ancien_prix: undefined,
-      stock: 0
+      stock: 0,
+      nouveau: 0
     };
     this.successMsg = '';
     this.errorMsg = '';
@@ -130,21 +157,53 @@ export class AdminGamesComponent implements OnInit {
   cancelCreate(): void {
     this.isCreating = false;
     this.editForm = {};
+    this.selectedCategories = [];
+    this.selectedPlateformes = [];
+  }
+
+  // Gestion des cases à cocher Catégories
+  toggleCategory(id: number, event: any): void {
+    if (event.target.checked) {
+      this.selectedCategories.push(id);
+    } else {
+      this.selectedCategories = this.selectedCategories.filter(c => c !== id);
+    }
+  }
+
+  // Gestion des cases à cocher Plateformes
+  togglePlatform(id: number, event: any): void {
+    if (event.target.checked) {
+      this.selectedPlateformes.push(id);
+    } else {
+      this.selectedPlateformes = this.selectedPlateformes.filter(p => p !== id);
+    }
   }
 
   saveCreate(): void {
+    if (this.selectedCategories.length === 0 || this.selectedPlateformes.length === 0) {
+      this.errorMsg = 'Veuillez sélectionner au moins un type de jeu (catégorie) et une plateforme.';
+      return;
+    }
+
     this.saving = true;
     this.errorMsg = '';
     this.cdr.detectChanges();
 
-    // Remplace "createGame" par le nom exact de ta méthode d'ajout dans gameService
-    this.gameService.createGame(this.editForm).subscribe({
+    // On greffe les tableaux de sélections multiples à l'objet envoyé au PHP
+    const payload = {
+      ...this.editForm,
+      id_categories: this.selectedCategories,
+      id_plateformes: this.selectedPlateformes
+    };
+
+    this.gameService.createGame(payload).subscribe({
       next: (res) => {
-        // Ajoute le nouveau jeu en haut de la liste locale
         this.games.unshift(res.jeu); 
         this.successMsg = `« ${res.jeu.titre} » a bien été ajouté au catalogue.`;
         this.isCreating = false;
         this.editForm = {};
+        this.selectedCategories = [];
+        this.selectedPlateformes = [];
         this.saving = false;
         this.cdr.detectChanges();
       },
@@ -156,15 +215,12 @@ export class AdminGamesComponent implements OnInit {
     });
   }
 
-  // --- ACTION DE SUPPRESSION ---
   deleteGame(game: Game): void {
     const confirmDelete = confirm(`Êtes-vous sûr de vouloir supprimer définitivement le jeu « ${game.titre} » ?`);
-    
     if (confirmDelete && game.id_jeu) {
       this.errorMsg = '';
       this.successMsg = '';
       
-      // Remplace "deleteGame" par le nom exact de ta méthode de suppression dans gameService
       this.gameService.deleteGame(game.id_jeu).subscribe({
         next: () => {
           this.games = this.games.filter(g => g.id_jeu !== game.id_jeu);

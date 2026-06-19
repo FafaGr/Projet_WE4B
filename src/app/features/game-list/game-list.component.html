@@ -1,0 +1,54 @@
+<main class="py-5 text-white bg-dark">
+  <div class="container-fluid px-4">
+
+    <section class="mb-5" id="filters" [formGroup]="filterForm">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="input-group">
+            <input type="text" formControlName="search" class="form-control bg-secondary border-0 text-white" placeholder="Rechercher un jeu...">
+            <button class="btn btn-danger" type="button">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select formControlName="category" class="form-select bg-secondary border-0 text-white">
+            <option [value]="0">Toutes les catégories</option>
+            <option *ngFor="let cat of categories" [value]="cat.id_cat">
+              {{ cat.libelle }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select formControlName="sort" class="form-select bg-secondary border-0 text-white">
+            <option value="news">Nouveautés</option>
+            <option value="price-asc">Prix : croissant</option>
+            <option value="price-desc">Prix : décroissant</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <div class="row g-4" id="games-container" [style.opacity]="isLoading ? '0.5' : '1'">
+      
+      <div class="col-6 col-md-4 col-lg-3" *ngFor="let jeu of games">
+        <app-game-card 
+          [jeu]="jeu" 
+          [feedback]="cartFeedback[jeu.id_jeu!] || 'idle'"
+          (addToCartClick)="addToCart($event)">
+        </app-game-card>
+      </div>
+
+      <div class="col-12 text-center py-5" *ngIf="games.length === 0 && !isLoading">
+        <p class="text-secondary">Aucun jeu trouvé pour ces critères.</p>
+      </div>
+
+      <div class="col-12 text-center py-5" *ngIf="hasError">
+        <p class="text-danger">
+          <i class="fas fa-exclamation-triangle me-2"></i>Impossible de charger les jeux. Vérifie que XAMPP est démarré.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</main>

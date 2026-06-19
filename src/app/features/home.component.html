@@ -1,0 +1,74 @@
+<section class="hero-section position-relative overflow-hidden">
+  <div class="hero-background" style="background: linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 100%);"></div>
+  <div class="container-fluid h-100 d-flex align-items-center" style="min-height: 350px;">
+    <div class="row w-100">
+      <div class="col-lg-8 z-3 ps-5">
+        <h1 class="display-4 fw-bold text-white mb-3">
+          Les Meilleurs <span class="text-danger">Jeux</span>
+        </h1>
+        <p class="lead text-secondary mb-4">Découvrez notre sélection exclusive au meilleur prix avec activation instantanée.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 border-bottom border-secondary text-white" *ngIf="jeuxDuMoment.length > 0" style="background-color: #121220;">
+  <div class="container-fluid px-4">
+    
+    <div class="d-flex align-items-center mb-5">
+      <div class="bg-danger text-white rounded p-2 me-3 d-inline-flex align-items-center justify-content-center">
+        <i class="fas fa-trophy fa-lg text-warning"></i>
+      </div>
+      <div>
+        <h3 class="fw-bold mb-0 text-white text-uppercase tracking-wider">Le Podium de la Communauté</h3>
+        <p class="text-secondary small mb-0">Les 3 titres les plus consultés</p>
+      </div>
+    </div>
+
+    <div class="row g-4 align-items-md-end justify-content-center">
+      
+      <div class="col-10 col-sm-6 col-md-4" *ngFor="let jeu of jeuxDuMoment; let i = index">
+        
+        <div class="podium-step-wrapper position-relative" 
+             [ngClass]="{
+               'order-md-2 mb-md-4': i === 1, 
+               'order-md-1 small-step': i === 0, 
+               'order-md-3 small-step': i === 2
+             }">
+          
+          <div class="podium-badge position-absolute top-0 start-50 translate-middle z-3 shadow-lg rounded-circle d-flex align-items-center justify-content-center fw-bold"
+               [ngClass]="{
+                 'bg-warning text-dark fs-3': i === 1,
+                 'bg-light text-dark fs-5': i === 0,
+                 'text-white fs-5': i === 2
+               }"
+               [style.background-color]="i === 2 ? '#cd7f32' : ''" 
+               style="width: 45px; height: 45px; border: 2px solid rgba(255,255,255,0.2);">
+            <i class="fas" [ngClass]="{'fa-crown': i === 1, 'fa-medal': i !== 1}"></i>
+          </div>
+
+          <div [ngClass]="{'border border-warning rounded shadow-lg': i === 1}" 
+               [style.box-shadow]="i === 1 ? '0 0 20px rgba(255, 193, 7, 0.2)' : ''">
+            
+            <app-game-card 
+              [jeu]="jeu" 
+              [feedback]="cartFeedback[jeu.id_jeu!] || 'idle'"
+              (addToCartClick)="addToCart($event)">
+            </app-game-card>
+
+          </div>
+
+          <div class="text-center mt-3 d-none d-md-block text-uppercase tracking-wider fw-bold small text-secondary">
+            {{ i === 1 ? '1er du Classement' : (i === 0 ? '2ème Place' : '3ème Place') }}
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<app-game-list></app-game-list>

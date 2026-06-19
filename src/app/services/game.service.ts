@@ -1,3 +1,4 @@
+// src/app/services/game.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -17,7 +18,6 @@ export interface UpdateGameResponse {
   jeu: Game;
 }
 
-// Interface de réponse pour la création d'un jeu
 export interface CreateGameResponse {
   success: boolean;
   jeu: Game;
@@ -30,16 +30,33 @@ export class GameService {
   private detailApiUrl = 'http://localhost/WE4B/api/game-detail.php';
   private updateApiUrl = 'http://localhost/WE4B/api/update-game.php';
   private reviewApiUrl = 'http://localhost/WE4B/api/post_review.php';
-  
-  // Nouvelles URL d'API pour la création et la suppression
   private createApiUrl = 'http://localhost/WE4B/api/create-game.php';
   private deleteApiUrl = 'http://localhost/WE4B/api/delete-game.php';
+  
+  // URL vers le script de tracking MongoDB
+  private trackApiUrl = 'http://localhost/WE4B/api/track-action.php';
 
   constructor(private http: HttpClient) {}
 
+  /**
+   * Envoie une interaction utilisateur vers MongoDB
+   */
+  logAction(typeAction: string, idJeu?: number, idUser?: number, details?: any): void {
+    const payload = {
+      type_action: typeAction,
+      id_jeu: idJeu || null,
+      id_user: idUser || null,
+      details: details || null
+    };
+
+    // Exécution en tâche de fond (.subscribe isolé)
+    this.http.post(this.trackApiUrl, payload).subscribe({
+      error: (err) => console.error('Erreur lors du tracking NoSQL :', err)
+    });
+  }
+
   getAll(filters?: GameFilters): Observable<Game[]> {
     let params = new HttpParams();
-
     if (filters) {
       if (filters.platform)                    params = params.set('platform', filters.platform);
       if (filters.category && filters.category !== 0) params = params.set('category', filters.category.toString());
@@ -85,12 +102,8 @@ export class GameService {
     );
   }
 
-  /**
-   * Met à jour les informations d'un jeu (admin).
-   */
   updateGame(id: number, data: Partial<Game>): Observable<UpdateGameResponse> {
     const payload = { id_jeu: id, ...data };
-
     return this.http.put<UpdateGameResponse>(this.updateApiUrl, payload).pipe(
       map(res => ({
         ...res,
@@ -108,9 +121,6 @@ export class GameService {
     );
   }
 
-  /**
-   * Ajoute un nouveau jeu (admin).
-   */
   createGame(data: Partial<Game>): Observable<CreateGameResponse> {
     return this.http.post<CreateGameResponse>(this.createApiUrl, data).pipe(
       map(res => ({
@@ -129,13 +139,21 @@ export class GameService {
     );
   }
 
-  /**
-   * Supprime un jeu à partir de son ID (admin).
-   */
+  private trendingApiUrl = 'http://localhost/WE4B/api/games-trending.php';
+
+  getTrendingGames(): Observable<Game[]> {
+    return this.http.get<Game[]>(this.trendingApiUrl).pipe(
+      map(games => games.map(g => ({
+        ...g,
+        prix:        +g.prix,
+        ancien_prix: g.ancien_prix != null ? +g.ancien_prix : null,
+        stock:       +g.stock,
+      })))
+    );
+  }
+
   deleteGame(id: number): Observable<{ success: boolean }> {
     let params = new HttpParams().set('id', id.toString());
-    
-    // Utilisation d'une requête DELETE avec passage de l'ID en paramètre d'URL (ou query param)
     return this.http.delete<{ success: boolean }>(this.deleteApiUrl, { params });
   }
 }

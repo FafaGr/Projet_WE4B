@@ -1,0 +1,28 @@
+<div class="card bg-dark border-secondary">
+  <div class="card-body d-flex align-items-center gap-4">
+
+    <img *ngIf="cmd.image_url" [src]="cmd.image_url" [alt]="cmd.jeu_titre"
+         class="rounded" style="width:80px; height:60px; object-fit:cover; flex-shrink:0;">
+    <div *ngIf="!cmd.image_url" class="rounded bg-secondary d-flex align-items-center justify-content-center"
+         style="width:80px; height:60px; flex-shrink:0;">
+      <i class="fas fa-gamepad text-muted"></i>
+    </div>
+
+    <div class="flex-grow-1">
+      <h6 class="mb-1 fw-semibold text-white">{{ cmd.jeu_titre }}</h6>
+      <div class="text-secondary small">
+        <i class="fas fa-calendar-alt me-1"></i>
+        {{ cmd.date_com | date:'dd/MM/yyyy à HH:mm' }}
+        &nbsp;·&nbsp;
+        Quantité : <strong>{{ cmd.qty }}</strong>
+        &nbsp;·&nbsp;
+        Prix unit. : <strong>{{ cmd.jeu_prix | number:'1.2-2'}} €</strong>
+      </div>
+    </div>
+
+    <div class="text-end" style="flex-shrink:0;">
+      <div class="text-success fw-bold fs-5">{{ cmd.total_ligne | number:'1.2-2':'fr' }} €</div>
+      <div class="text-secondary small">Total</div>
+    </div>
+  </div>
+</div>

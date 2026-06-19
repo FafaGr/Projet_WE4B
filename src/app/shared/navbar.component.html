@@ -7,20 +7,6 @@
       <span class="text-danger">Game</span>Store
     </a>
 
-    <!-- Barre de recherche (desktop) -->
-    <div class="search-box-wrapper ms-3 flex-grow-1 d-none d-md-block">
-      <div class="input-group input-group-sm">
-        <input
-          type="text"
-          class="form-control bg-secondary border-0 text-white"
-          placeholder="Rechercher un jeu..."
-          [(ngModel)]="searchQuery"
-          (keyup)="onSearchKeyup($event)">
-        <button class="btn btn-danger" type="button" (click)="search()">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
-    </div>
 
     <!-- Toggler mobile -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">

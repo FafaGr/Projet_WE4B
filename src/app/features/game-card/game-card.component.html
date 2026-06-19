@@ -1,0 +1,57 @@
+<div class="game-card h-100 bg-darker border border-secondary rounded">
+  
+  <a [routerLink]="['/games', jeu.id_jeu]" class="game-link text-decoration-none text-reset">
+    <div class="game-image-wrapper position-relative overflow-hidden">
+      <img [src]="jeu.image_url" class="card-img-top img-fluid" [alt]="jeu.titre">
+      <div *ngIf="jeu.stock && jeu.stock > 0 && jeu.stock < 5" class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">
+        Stock limité
+      </div>
+      
+      <div *ngIf="jeu.nouveau === 1 && !(jeu.stock && jeu.stock > 0 && jeu.stock < 5)" class="badge bg-danger text-white position-absolute top-0 end-0 m-2 shadow text-uppercase tracking-wider fw-bold" style="font-size: 0.7rem; padding: 0.4em 0.6em;">
+        New
+      </div>
+    </div>
+  </a>
+
+  <div class="card-body d-flex flex-column p-3">
+    <h5 class="card-title text-white">{{ jeu.titre }}</h5>
+    <p class="text-secondary small mb-2">{{ jeu.categories_noms || 'Général' }}</p>
+    
+    <div class="mt-auto">
+      <div class="price-section mb-3">
+        <span class="h4 text-danger fw-bold">{{ jeu.prix | number:'1.2-2' }}€</span>
+        
+        <ng-container *ngIf="jeu.ancien_prix && jeu.ancien_prix > jeu.prix">
+          <span class="text-secondary small ms-2">
+            <del>{{ jeu.ancien_prix | number:'1.2-2' }}€</del>
+          </span>
+          <span class="badge bg-danger ms-1">
+            -{{ (1 - (jeu.prix / jeu.ancien_prix)) * 100 | number:'1.0-0' }}%
+          </span>
+        </ng-container>
+      </div>
+
+      <button class="btn w-100 btn-sm"
+              [disabled]="feedback === 'stock_max'"
+              [ngClass]="{
+                'btn-danger':  !feedback || feedback === 'idle',
+                'btn-success': feedback === 'added',
+                'btn-warning': feedback === 'stock_max'
+              }"
+              (click)="onAddToCart()">
+        <ng-container [ngSwitch]="feedback">
+          <ng-container *ngSwitchCase="'added'">
+            <i class="fas fa-check"></i> Ajouté !
+          </ng-container>
+          <ng-container *ngSwitchCase="'stock_max'">
+            <i class="fas fa-times"></i> Stock max atteint
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            <i class="fas fa-shopping-cart"></i> Ajouter
+          </ng-container>
+        </ng-container>
+      </button>
+    </div>
+  </div>
+
+</div>
